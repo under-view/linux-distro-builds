@@ -3,6 +3,7 @@
 <manifest>
   <remote name="normal-git" revision="master" fetch="https://github.com/" />
   <project path="working/meta-udoo-bolt" name="under-view/meta-udoo-bolt" remote="normal-git" />
+  <project path="working/meta-underview" name="under-view/meta-underview" remote="normal-git" />
   <project path="working/meta-wayland" name="MarkusVolk/meta-wayland" remote="normal-git" />
 
   <remote name="git-oe-org" revision="kirkstone" fetch="https://git.openembedded.org/" />

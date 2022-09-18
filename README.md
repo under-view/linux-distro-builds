@@ -13,3 +13,8 @@ $ chmod a+x repo
 $ ./repo init -u "https://github.com/under-view/linux-distro-builds.git"
 $ ./repo sync
 ```
+
+**Build**
+```sh
+$ ./build.sh --machine udoo-bolt-emmc
+```

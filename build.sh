@@ -175,15 +175,15 @@ display_flash_err() {
 flash_blockdev=""
 
 for ((arg=1; arg<=$#; arg++)); do
-  arg_to_flag=$((arg+1))
+  arg_passed_to_flag=$((arg+1))
   case "${!arg}" in
     -m|--machine)
-      MACHINE="${!arg_to_flag}"
+      MACHINE="${!arg_passed_to_flag}"
       display_machine_err "${MACHINE}" || exit $FAILURE
       ((arg++))
       ;;
     -f|--flash)
-      flash_blockdev="${!arg_to_flag}"
+      flash_blockdev="${!arg_passed_to_flag}"
       display_flash_err "${flash_blockdev}" || exit $FAILURE
       ((arg++))
       ;;

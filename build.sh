@@ -6,8 +6,9 @@ FAILURE=1
 CDIR="$(pwd)"
 WORK_DIR="${CDIR}/working"
 BUILD_DIR="${WORK_DIR}/underview-os"
+IMAGES_DIR="${WORK_DIR}/images"
 
-IMAGETYPE="core-image-base"
+IMAGE_TYPE="core-image-base"
 
 export MACHINE=""
 
@@ -15,7 +16,7 @@ export MACHINE=""
 # available physical memory) which can lead to out of memory errors
 # The out of memory (OOM) killer kicks in and selects a process to kill to retrieve some memory.
 # Thus why we see the bellow error at random points of the build
-#     aarch64-kraken-linux-g++: fatal error: Killed signal terminated program cc1plus
+#     x86_64-underview-linux-g++: fatal error: Killed signal terminated program cc1plus
 # Lowering BBTHREADS and MTHREADS ensures the system doesn't run out of memory when building
 core_count=$(nproc)
 export PARALLEL_MAKE="-j $((core_count / 2))"
@@ -87,8 +88,24 @@ add_layers() {
 
 
 build() {
-  bitbake "${IMAGETYPE}"
-  [[ $? -ne 0 ]] && return $FAILURE
+  bitbake "${IMAGE_TYPE}" || return $FAILURE
+
+  return $SUCCES
+}
+
+
+copy_final_artifacts() {
+  mkdir -pv "${IMAGES_DIR}"
+
+  copy_final_artifacts_dir="${BUILD_DIR}/tmp/deploy/images/${MACHINE}"
+
+  cp "${copy_final_artifacts_dir}/${IMAGE_TYPE}-${MACHINE}.wic.bmap" "${IMAGES_DIR}" || return $FAILURE
+  cp "${copy_final_artifacts_dir}/${IMAGE_TYPE}-${MACHINE}.wic.gz"   "${IMAGES_DIR}" || return $FAILURE
+  cp "${copy_final_artifacts_dir}/${IMAGE_TYPE}-${MACHINE}.wic"      "${IMAGES_DIR}" || return $FAILURE
+
+  print_me success "\ncopied ${IMAGE_TYPE}-${MACHINE}.wic.bmap to ${IMAGES_DIR}\n"
+  print_me success "copied ${IMAGE_TYPE}-${MACHINE}.wic.gz to ${IMAGES_DIR}\n"
+  print_me success "copied ${IMAGE_TYPE}-${MACHINE}.wic to ${IMAGES_DIR}\n"
 
   return $SUCCES
 }
@@ -98,6 +115,7 @@ build_image() {
   enter_environment || return $FAILURE
   add_layers || return $FAILURE
   build || return $FAILURE
+  copy_final_artifacts || return $FAILURE
 
   return $SUCCESS
 }
@@ -107,6 +125,7 @@ flash_image() {
   flash_blockdev=$1
   return $SUCCESS
 }
+
 
 # If no arguments supplied run help function
 [[ $# -eq 0 ]] && { help_msg $0 ; exit $FAILURE ; }

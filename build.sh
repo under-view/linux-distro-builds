@@ -139,6 +139,24 @@ flash_image() {
 }
 
 
+display_machine_err() {
+  [[ -n "${MACHINE}" ]] || {
+    print_me err "[x] Must enter a machine name\n"
+    help_msg $0 ; return $FAILURE
+  }
+
+  machines=(udoo-bolt-live-usb udoo-bolt-emmc)
+  for machine in "${machines[@]}"; do
+    if [[ "${machine}" == "${MACHINE}" ]]; then
+      return $SUCCESS
+    fi
+  done
+
+  print_me err "[x] error: ${MACHINE} isn't in the list of buildable images\n"
+  return $FAILURE
+}
+
+
 display_flash_err() {
   flash_blockdev=$1
 
@@ -161,6 +179,7 @@ for ((arg=1; arg<=$#; arg++)); do
   case "${!arg}" in
     -m|--machine)
       MACHINE="${!arg_to_flag}"
+      display_machine_err "${MACHINE}" || exit $FAILURE
       ((arg++))
       ;;
     -f|--flash)
@@ -178,13 +197,6 @@ for ((arg=1; arg<=$#; arg++)); do
       ;;
   esac
 done
-
-
-[[ -n "${MACHINE}" ]] || {
-  print_me err "[x] Must enter machine name\n"
-  help_msg $0
-  exit $FAILURE
-}
 
 
 [[ -n "${flash_blockdev}" ]] && {

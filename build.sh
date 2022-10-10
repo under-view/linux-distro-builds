@@ -122,8 +122,32 @@ build_image() {
 
 
 flash_image() {
+  [[ -d "${IMAGES_DIR}" ]] || {
+    print_me err "[x] ${IMAGES_DIR}: does not exist. Must run build script.\n"
+    return $FAILURE
+  }
+
   flash_blockdev=$1
+  sudo umount "${flash_blockdev}"* 2>/dev/null
+
+  sudo bmaptool copy --bmap \
+                "${IMAGES_DIR}/${IMAGE_TYPE}-${MACHINE}.wic.bmap" \
+                "${IMAGES_DIR}/${IMAGE_TYPE}-${MACHINE}.wic.gz" \
+                "${flash_blockdev}"
+
   return $SUCCESS
+}
+
+
+display_flash_err() {
+  flash_blockdev=$1
+
+  [[ -n "${flash_blockdev}" ]] || {
+    print_me err "[x] error: Must pass file to flash\n"
+    return $FAILURE
+  }
+
+  return $SUCCES
 }
 
 
@@ -141,6 +165,7 @@ for ((arg=1; arg<=$#; arg++)); do
       ;;
     -f|--flash)
       flash_blockdev="${!arg_to_flag}"
+      display_flash_err "${flash_blockdev}" || exit $FAILURE
       ((arg++))
       ;;
     -h|--help)
@@ -163,9 +188,9 @@ done
 
 
 [[ -n "${flash_blockdev}" ]] && {
-  flash_image "${flash_blockdev}"
+  flash_image "${flash_blockdev}" || exit $FAILURE
 } || {
-  build_image
+  build_image || exit $FAILURE
 }
 
 exit $SUCCESS

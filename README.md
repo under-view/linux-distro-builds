@@ -18,3 +18,8 @@ $ ./repo sync
 ```sh
 $ ./build.sh --machine udoo-bolt-emmc
 ```
+
+**Flashing**
+```sh
+$ ./build.sh --machine udoo-bolt-live-usb --flash <block device>
+```

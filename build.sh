@@ -133,7 +133,10 @@ flash_image() {
   sudo bmaptool copy --bmap \
                 "${IMAGES_DIR}/${IMAGE_TYPE}-${MACHINE}.wic.bmap" \
                 "${IMAGES_DIR}/${IMAGE_TYPE}-${MACHINE}.wic.gz" \
-                "${flash_blockdev}"
+                "${flash_blockdev}" || return $FAILURE
+
+  sudo eject "${flash_blockdev}"
+  print_me warn "ejecting --> ${flash_blockdev}\n"
 
   return $SUCCESS
 }

@@ -13,6 +13,8 @@ IMAGE_TYPE="core-image-base"
 export MACHINE=""
 export DISTRO="underview"
 
+source "${CDIR}/helpers.sh"
+
 # User space memory allocation is allowed to over-commit memory (more than
 # available physical memory) which can lead to out of memory errors
 # The out of memory (OOM) killer kicks in and selects a process to kill to retrieve some memory.
@@ -23,39 +25,6 @@ core_count=$(nproc)
 export PARALLEL_MAKE="-j $((core_count / 2))"
 export BB_NUMBER_THREADS=$((core_count / 2))
 export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS MACHINE DISTRO PARALLEL_MAKE BB_NUMBER_THREADS"
-
-
-###########################################
-# Just makes log output colorful
-###########################################
-print_me() {
-  case $1 in
-  success) printf "\e[32;1m" ;;
-  err)     printf "\e[31;1m" ;;
-  info)    printf "\e[34;1m" ;;
-  warn)    printf "\e[33;1m" ;;
-  *)       return $FAILURE
-  esac
-
-  # print output and reset terminal color
-  printf "${@:2}" ; printf "\x1b[0m"
-}
-
-
-#####################################################
-# Just a help message
-#####################################################
-help_msg() {
-  fname=$1
-
-  print_me success "Usage: ${fname} [options]\n"
-  print_me warn    "Example: ${fname} --machine udoo-bolt-emmc\n"
-  print_me info    "Options:\n"
-  print_me err     "\t-m, --machine <name>   " ; print_me info "\tSpecify a machine to build for a given board\n"
-  print_me err     "\t-d, --distro <name>    " ; print_me info "\tSpecify distro to build for a given board\n"
-  print_me err     "\t-f, --flash <blockdev> " ; print_me info "\tFor flashing the devices eMMC over usb\n"
-  print_me err     "\t-h, --help             " ; print_me info "\tSee this message\n"
-}
 
 
 enter_environment() {
@@ -141,46 +110,6 @@ flash_image() {
   print_me warn "ejecting --> ${flash_blockdev}\n"
 
   return $SUCCESS
-}
-
-
-display_machine_err() {
-  [[ -n "${MACHINE}" ]] || {
-    print_me err "[x] Must enter a machine name\n"
-    help_msg $0 ; return $FAILURE
-  }
-
-  machines=(udoo-bolt-live-usb udoo-bolt-emmc)
-  for machine in "${machines[@]}"; do
-    if [[ "${machine}" == "${MACHINE}" ]]; then
-      return $SUCCESS
-    fi
-  done
-
-  print_me err "[x] error: ${MACHINE} isn't in the list of buildable images\n"
-  return $FAILURE
-}
-
-
-display_flash_err() {
-  flash_blockdev=$1
-
-  [[ -n "${flash_blockdev}" ]] || {
-    print_me err "[x] error: Must pass file to flash\n"
-    return $FAILURE
-  }
-
-  return $SUCCES
-}
-
-
-display_distro_err() {
-  [[ -n "${DISTRO}" ]] || {
-    print_me err "[x] Must enter a distro name\n"
-    help_msg $0 ; return $FAILURE
-  }
-
-  return $SUCCES
 }
 
 

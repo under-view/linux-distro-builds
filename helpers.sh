@@ -71,14 +71,14 @@ display_flash_err() {
     return $FAILURE
   }
 
-  return $SUCCES
+  return $SUCCESS
 }
 
 
 print_distro_configs() {
   distros=("$@")
 
-  print_me warn "List of buildable images\n"
+  print_me warn "List of distro configs to create images with\n"
   for distro in "${distros[@]}"; do
     print_me warn "\t[*] ${distro}\n"
   done
@@ -94,5 +94,14 @@ display_distro_err() {
     echo ; help_msg $0 ; return $FAILURE
   }
 
-  return $SUCCES
+  for distro in "${distros[@]}"; do
+    if [[ "${distro}" == "${DISTRO}" ]]; then
+      return $SUCCESS
+    fi
+  done
+
+  print_me err "[x] error: ${DISTRO} isn't in the list of distro configs\n"
+  print_distro_configs "${distros[@]}"
+
+  return $FAILURE
 }

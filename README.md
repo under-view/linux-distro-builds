@@ -17,6 +17,8 @@ $ ./repo sync
 **Build**
 ```sh
 $ ./build.sh --machine udoo-bolt-emmc
+# Building Project North Star Demo distro
+$ ./build.sh --machine udoo-bolt-emmc --distro north-star-demo
 ```
 
 **Flashing**

@@ -11,6 +11,7 @@ IMAGES_DIR="${WORK_DIR}/images"
 IMAGE_TYPE="core-image-base"
 
 export MACHINE=""
+export DISTRO="underview"
 
 # User space memory allocation is allowed to over-commit memory (more than
 # available physical memory) which can lead to out of memory errors
@@ -21,7 +22,7 @@ export MACHINE=""
 core_count=$(nproc)
 export PARALLEL_MAKE="-j $((core_count / 2))"
 export BB_NUMBER_THREADS=$((core_count / 2))
-export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS MACHINE PARALLEL_MAKE BB_NUMBER_THREADS"
+export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS MACHINE DISTRO PARALLEL_MAKE BB_NUMBER_THREADS"
 
 
 ###########################################
@@ -51,6 +52,7 @@ help_msg() {
   print_me warn    "Example: ${fname} --machine udoo-bolt-emmc\n"
   print_me info    "Options:\n"
   print_me err     "\t-m, --machine <name>   " ; print_me info "\tSpecify a machine to build for a given board\n"
+  print_me err     "\t-d, --distro <name>    " ; print_me info "\tSpecify distro to build for a given board\n"
   print_me err     "\t-f, --flash <blockdev> " ; print_me info "\tFor flashing the devices eMMC over usb\n"
   print_me err     "\t-h, --help             " ; print_me info "\tSee this message\n"
 }
@@ -172,6 +174,16 @@ display_flash_err() {
 }
 
 
+display_distro_err() {
+  [[ -n "${DISTRO}" ]] || {
+    print_me err "[x] Must enter a distro name\n"
+    help_msg $0 ; return $FAILURE
+  }
+
+  return $SUCCES
+}
+
+
 # If no arguments supplied run help function
 [[ $# -eq 0 ]] && { help_msg $0 ; exit $FAILURE ; }
 
@@ -182,12 +194,17 @@ for ((arg=1; arg<=$#; arg++)); do
   case "${!arg}" in
     -m|--machine)
       MACHINE="${!arg_passed_to_flag}"
-      display_machine_err "${MACHINE}" || exit $FAILURE
+      display_machine_err || exit $FAILURE
       ((arg++))
       ;;
     -f|--flash)
       flash_blockdev="${!arg_passed_to_flag}"
       display_flash_err "${flash_blockdev}" || exit $FAILURE
+      ((arg++))
+      ;;
+    -d|--distro)
+      DISTRO="${!arg_passed_to_flag}"
+      display_distro_err || exit $FAILURE
       ((arg++))
       ;;
     -h|--help)

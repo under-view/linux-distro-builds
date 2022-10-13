@@ -66,7 +66,7 @@ build() {
 
 
 copy_final_artifacts() {
-  mkdir -pv "${IMAGES_DIR}"
+  mkdir -p "${IMAGES_DIR}"
 
   copy_final_artifacts_dir="${BUILD_DIR}/tmp/deploy/images/${MACHINE}"
 
@@ -147,6 +147,7 @@ for ((arg=1; arg<=$#; arg++)); do
   esac
 done
 
+IMAGES_DIR="${IMAGES_DIR}/${DISTRO}"
 
 [[ -n "${flash_blockdev}" ]] && {
   flash_image "${flash_blockdev}" || exit $FAILURE

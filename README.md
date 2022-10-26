@@ -10,7 +10,7 @@ $ chmod a+x repo
 
 **Initialize Repos**
 ```sh
-$ ./repo init -u "https://github.com/under-view/linux-distro-builds.git"
+$ ./repo init -u "https://github.com/under-view/linux-distro-builds.git" -b development
 $ ./repo sync
 ```
 

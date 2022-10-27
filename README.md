@@ -1,6 +1,6 @@
 # Underview Linux Distro Builds
 
-Repo that handles building underview linux distro's
+Repo that handles building underview linux distro's.
 
 **Clone Repo Command**
 ```sh
@@ -15,6 +15,9 @@ $ ./repo sync
 ```
 
 **Build**
+
+[Yocto project build host packages](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html#build-host-packages)
+
 ```sh
 $ ./build.sh --machine udoo-bolt-emmc
 # Building Project North Star Demo distro

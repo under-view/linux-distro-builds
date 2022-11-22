@@ -19,6 +19,12 @@ $ ./repo sync
 [Yocto project build host packages](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html#build-host-packages)
 
 ```sh
+# Arch Linux Packages
+$ sudo pacman -S jq wget curl dtc git git-lfs diffstat unzip texinfo python chrpath wget \
+                 zip xterm sdl rpcsvc-proto socat cpio inetutils python base-devel --noconfirm
+```
+
+```sh
 $ ./build.sh --machine udoo-bolt-emmc
 # Building Project North Star Demo distro
 $ ./build.sh --machine udoo-bolt-emmc --distro north-star-demo
